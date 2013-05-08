@@ -12,10 +12,10 @@ A:hover {text-decoration:underline;color:#999999;}
 	
 	<div style="background-color:black">
 		<h5>
-			<a href="/locadora">Início</a>
-			<a href="/locadora/view/clientes.php">Clientes</a>
-			<a href="/locadora/view/filmes.php">Filmes</a>
-			<a href="/locadora/view/locacoes.php">Locações</a>
+			<a href="/aksjdji">Início</a>
+			<a href="/aksjdji/view/clientes.php">Clientes</a>
+			<a href="/aksjdji/view/filmes.php">Filmes</a>
+			<a href="/aksjdji/view/locacoes.php">Locações</a>
 		</h5>
 	</div>
 	<?php
@@ -58,7 +58,7 @@ A:hover {text-decoration:underline;color:#999999;}
 		}
 		
 		echo "
-		<form action='/locadora/control/editarCliente.php'>
+		<form action='/aksjdji/control/editarCliente.php'>
 		<table>
 			<tr>
 				<td>

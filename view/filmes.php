@@ -13,15 +13,15 @@
 	
 	<div style="background-color:black">
 		<h5>
-			<a href="/locadora">Início</a>
-			<a href="/locadora/view/clientes.php">Clientes</a>
-			<a href="/locadora/view/filmes.php">Filmes</a>
-			<a href="/locadora/view/locacoes.php">Locações</a>
+			<a href="/aksjdji">Início</a>
+			<a href="/aksjdji/view/clientes.php">Clientes</a>
+			<a href="/aksjdji/view/filmes.php">Filmes</a>
+			<a href="/aksjdji/view/locacoes.php">Locações</a>
 		</h5>
 	</div>
 	
 	<div style="background-color:green">
-	<form action = "/locadora/view/filmes.php">
+	<form action = "/aksjdji/view/filmes.php">
 		<h6>
 			<b>Pesquisar por:</b>
 			<?php
@@ -67,7 +67,7 @@
 		</h6>
 	</form>
 	</div>
-	<a href="/locadora/control/cadastrarFilme.php"><button>Novo Filme</button></a>
+	<a href="/aksjdji/control/cadastrarFilme.php"><button>Novo Filme</button></a>
 	<hr/>
 	
 	<?php
@@ -93,7 +93,7 @@
 				$result;
 				if($tipoPesq == 'nome'){
 					$result = mysql_query("SELECT cod,nome,qtd,categoria1,categoria2,categoria3
-					FROM filmes WHERE $tipoPesq like '$pesq%' LIMIT 15");
+					FROM filmes WHERE $tipoPesq like '$pesq%' ORDER BY $tipoPesq LIMIT 15");
 				} else {
 					$result = mysql_query("SELECT cod,nome,qtd,categoria1,categoria2,categoria3
 					FROM filmes WHERE $tipoPesq = '$pesq' LIMIT 10");
@@ -157,7 +157,7 @@
 							</form>
 						</td>
 						<td>
-							<form action='/locadora/control/editarCliente.php'>
+							<form action='/aksjdji/control/editarCliente.php'>
 								<input type='hidden' name='cod' value = '".$row['cod']."'/>
 								<input type='hidden' name='nome' value = '".$row['nome']."'/>
 								<input type='hidden' name='qtd' value = '".$row['qtd']."'/>
