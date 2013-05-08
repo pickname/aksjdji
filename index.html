@@ -15,6 +15,7 @@ A:hover {text-decoration:underline;color:#999999;}
 			<a href="/aksjdji">Início</a>
 			<a href="/aksjdji/view/clientes.php">Clientes</a>
 			<a href="/aksjdji/view/filmes.php">Filmes</a>
+			<a href="/aksjdji/view/categorias.php">Categorias</a>
 			<a href="/aksjdji/view/locacoes.php">Locações</a>
 		</h5>
 	</div>

@@ -32,15 +32,16 @@ A:hover {text-decoration:underline;color:#999999;}
  
  </script>
 
-<title>Cadastrar DVD - Sistema de Locadora de Filmes</title>
+<title>Cadastrar Filmes - Sistema de Locadora de Filmes</title>
 <body>
-	<h1 align="center">Cadastrar DVD - Sistema de Locadora de Filmes<h1>
+	<h1 align="center">Cadastrar Filmes - Sistema de Locadora de Filmes<h1>
 	
 	<div style="background-color:black">
 		<h5>
 			<a href="/aksjdji">Início</a>
 			<a href="/aksjdji/view/clientes.php">Clientes</a>
 			<a href="/aksjdji/view/filmes.php">Filmes</a>
+			<a href="/aksjdji/view/categorias.php">Categorias</a>
 			<a href="/aksjdji/view/locacoes.php">Locações</a>
 		</h5>
 	</div>
@@ -52,7 +53,7 @@ A:hover {text-decoration:underline;color:#999999;}
 			$categoria2 = $_GET['categoria2'];
 			$categoria3 = $_GET['categoria3'];
 			
-			if($cod != ''){
+			if($nome != ''){
 				$conexao = mysql_connect('localhost:3306','root','');
 				mysql_select_db('locadora',$conexao);
 				if($conexao){
@@ -71,9 +72,10 @@ A:hover {text-decoration:underline;color:#999999;}
 				echo "<font color='red'>Nome é obrigatório!!!</font>";
 			}
 			
-		} else
+		}
 	?>
-	
+	</div>
+	<hr/>
 	<form action='/aksjdji/control/cadastrarFilme.php'>
 	<table>
 		<tr>
@@ -92,36 +94,69 @@ A:hover {text-decoration:underline;color:#999999;}
 				<input type='text' name='qtd' onkeypress="return mascara(this, '####')" maxlength="4"/>
 			</td>
 		</tr>
-		<tr>
-			<td>
-				Categoria1
-			</td>
-			<td>
-				<select name='categoria1'>
-					<option>opção1</option>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Categoria2
-			</td>
-			<td>
-				<select name='categoria2'>
-					<option>opção2</option>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Categoria3
-			</td>
-			<td>
-				<select name='categoria3'>
-					<option>opção3</option>
-				</select>
-			</td>
-		</tr>
+		<?php
+			$categorias = array();
+			$teste;
+			$conexao = mysql_connect('localhost','root','');
+			mysql_select_db('locadora',$conexao);
+			$result = mysql_query("SELECT cod,nome FROM categorias");
+			while(list($cod,$nome) = mysql_fetch_array($result)){
+				$categorias[] = $cod;
+				$categorias[] = $nome;
+			}
+			if($conexao && $result){
+			echo "
+				<tr>
+					<td>
+						Categoria1
+					</td>
+					<td>
+						<select name='categoria1'>";
+							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
+								echo "<option value=$categorias[$i]>$categorias[$j]</option>";
+							}
+							
+						echo "</select>
+					</td>
+				</tr>
+			";
+			echo "
+				<tr>
+					<td>
+						Categoria 2
+					</td>
+					<td>
+						<select name='categoria2'>
+							<option value=null>selecione</option>";
+							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
+								echo "<option value=$categorias[$i]>$categorias[$j]</option>";
+							}
+							
+						echo "</select>
+					</td>
+				</tr>
+			";
+			echo "
+				<tr>
+					<td>
+						Categoria 3
+					</td>
+					<td>
+						<select name='categoria3'>
+							<option value=null>selecione</option>";
+							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
+								echo "<option value=$categorias[$i]>$categorias[$j]</option>";
+							}
+							
+						echo "</select>
+					</td>
+				</tr>
+			";
+			} else {
+				echo "<font color='red'>SQL ERROR = ".mysql_error()."</font>";
+			}
+		?>
+		
 		<tr>
 			<td>
 			</td>
