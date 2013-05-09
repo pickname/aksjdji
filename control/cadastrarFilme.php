@@ -6,13 +6,6 @@ A:active {text-decoration:none;color:#ff0000;}
 A:hover {text-decoration:underline;color:#999999;} 
 </STYLE>
 <script language="JavaScript">
- function somenteNumero(o){
-	var v = o.value;
-	v=v.replace(/\D/g,"");             //Remove tudo o que não é dígito
-    v=v.replace(/^(\d{2})(\d)/g,"($1) $2"); //Coloca parênteses em volta dos dois primeiros dígitos
-    v=v.replace(/(\d)(\d{4})$/,"$1-$2");    //Coloca hífen entre o quarto e o quinto dígitos
-    o.value = v;
- }
  
  function mascara(t, mask){
 	var i = t.value.length;
@@ -49,10 +42,10 @@ A:hover {text-decoration:underline;color:#999999;}
 		if(isSet($_GET['nome'])){
 			$nome = $_GET['nome'];
 			$qtd = $_GET['qtd'];
-			$categoria1 = $_GET['categoria1'];
-			$categoria2 = $_GET['categoria2'];
-			$categoria3 = $_GET['categoria3'];
-			$sql = "INSERT INTO filmes (nome,qtd,categoria1,categoria2,categoria3) VALUES ('$nome','$qtd',$categoria1,$categoria2,$categoria3)";
+			$cod_categoria1 = $_GET['cod_categoria1'];
+			$cod_categoria2 = $_GET['cod_categoria2'];
+			$cod_categoria3 = $_GET['cod_categoria3'];
+			$sql = "INSERT INTO filmes (nome,qtd,categoria1,categoria2,categoria3) VALUES ('$nome','$qtd',$cod_categoria1,$cod_categoria2,$cod_categoria3)";
 			
 			if($nome != ''){
 				$conexao = mysql_connect('localhost:3306','root','');
@@ -111,7 +104,7 @@ A:hover {text-decoration:underline;color:#999999;}
 						Categoria1
 					</td>
 					<td>
-						<select name='categoria1'>";
+						<select name='cod_categoria1'>";
 							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
 								echo "<option value=$categorias[$i]>$categorias[$j]</option>";
 							}
@@ -126,7 +119,7 @@ A:hover {text-decoration:underline;color:#999999;}
 						Categoria 2
 					</td>
 					<td>
-						<select name='categoria2'>
+						<select name='cod_categoria2'>
 							<option value=null>selecione</option>";
 							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
 								echo "<option value=$categorias[$i]>$categorias[$j]</option>";
@@ -142,7 +135,7 @@ A:hover {text-decoration:underline;color:#999999;}
 						Categoria 3
 					</td>
 					<td>
-						<select name='categoria3'>
+						<select name='cod_categoria3'>
 							<option value=null>selecione</option>";
 							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
 								echo "<option value=$categorias[$i]>$categorias[$j]</option>";

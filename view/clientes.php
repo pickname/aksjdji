@@ -78,10 +78,11 @@
 			
 		if(isSet($_GET['cpf'])){
 			$cpf = $_GET['cpf'];
+			$nome = $_GET['nome'];
 			
 			$resultExcluir = mysql_query("DELETE FROM clientes WHERE cpf = '$cpf'");
 			if($resultExcluir){
-				echo "<font color='lime'>CLIENTE $cpf EXCLUIDO COM SUCESSO!</font> <br/><br/>";
+				echo "<font color='lime'>CLIENTE $nome EXCLUIDO COM SUCESSO!</font> <br/><br/>";
 			} else {
 				echo "FALHA NA EXCLUSÃO! " . mysql_error();
 			}
@@ -153,7 +154,8 @@
 					</td>
 					<td>
 						<form action='".$_SERVER['PHP_SELF']."'>
-						<input type='hidden' name='cpf' value = '".$row['cpf']."'/>
+							<input type='hidden' name='cpf' value = '".$row['cpf']."'/>
+							<input type='hidden' name='nome' value = '".$row['nome']."'/>
 							<input type='hidden' name='pesq' value = '$pesq'/>
 							<input type='hidden' name='tipoPesq' value = '$tipoPesq'/>
 							<button>Delete</button>
@@ -180,7 +182,6 @@
 				echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
 			}
 			mysql_close();
-		
 	?>
 </body>
 </html>

@@ -20,6 +20,9 @@ A:hover {text-decoration:underline;color:#999999;}
 		</h5>
 	</div>
 	<?php
+		$conexao = mysql_connect('localhost:3306','root','');
+		mysql_select_db('locadora',$conexao);
+		
 		$cod = '';
 		$nome = '';
 		if(isSet($_GET['cod'])){
@@ -27,8 +30,7 @@ A:hover {text-decoration:underline;color:#999999;}
 			$nome = $_GET['nome'];
 		}
 		if(isSet($_GET['alterar'])){
-			$conexao = mysql_connect('localhost:3306','root','');
-			mysql_select_db('locadora',$conexao);
+			
 			if($conexao){
 				$result = mysql_query("UPDATE categorias SET nome='$nome' WHERE cod='$cod'");
 				if($result){
@@ -40,7 +42,7 @@ A:hover {text-decoration:underline;color:#999999;}
 		}
 		
 		echo "
-		<form action='/aksjdji/control/editarCategoria.php'>
+		<form action='".$_SERVER['PHP_SELF']."'>
 		<table>
 			<tr>
 				<td>
@@ -68,6 +70,7 @@ A:hover {text-decoration:underline;color:#999999;}
 			</tr>
 		</table>
 		</form>";
+		mysql_close();
 	?>
 </body>
 </html>

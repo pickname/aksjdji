@@ -20,53 +20,49 @@ A:hover {text-decoration:underline;color:#999999;}
 		</h5>
 	</div>
 	<?php
-		$cpf = '';
+		$conexao = mysql_connect('localhost:3306','root','');
+		mysql_select_db('locadora',$conexao);
+		
+		$cod = '';
 		$nome = '';
-		$dia = '1';
-		$mes = '1';
-		$ano = '2013';
-		$endereco = '';
-		$telefone = '';
-		if(isSet($_GET['cpf'])){
-			$cpf = $_GET['cpf'];
+		$qtd = '';
+		$cod_categoria1 = '';
+		$cod_categoria2 = '';
+		$cod_categoria3 = '';
+		
+		if(isSet($_GET['cod'])){
+			$cod = $_GET['cod'];
 			$nome = $_GET['nome'];
-			$endereco = $_GET['endereco'];
-			$telefone = $_GET['telefone'];
-			if(isSet($_GET['data_nascimento'])){
-				$dtN = $_GET['data_nascimento'];
-				$dia = date('d',strtotime($dtN));
-				$mes = date('m',strtotime($dtN));
-				$ano = date('Y',strtotime($dtN));
-			} else {
-				$dia = $_GET['dia'];
-				$mes = $_GET['mes'];
-				$ano = $_GET['ano'];
-			}
+			$qtd = $_GET['qtd'];
+			$cod_categoria1 = $_GET['cod_categoria1'];
+			$cod_categoria2 = $_GET['cod_categoria2'];
+			$cod_categoria3 = $_GET['cod_categoria3'];
+			
 		}
 		if(isSet($_GET['alterar'])){
-			$conexao = mysql_connect('localhost:3306','root','');
-			mysql_select_db('locadora',$conexao);
+			
+			$sql = "UPDATE filmes SET nome='$nome',qtd=$qtd,categoria1=$cod_categoria1,categoria2=$cod_categoria2,categoria3=$cod_categoria3 WHERE cod=$cod";
 			if($conexao){
-				$data_nascimento = $_GET['ano'] . '-' .$_GET['mes'] . '-' .$_GET['dia'];
-				$result = mysql_query("UPDATE clientes SET nome='$nome',data_nascimento='$data_nascimento',
-					endereco='$endereco',telefone='$telefone' WHERE cpf='$cpf'");
+				$result = mysql_query($sql);
 				if($result){
-					echo "<font color='lime'>CLIENTE $nome ATUALIZADO COM SUCESSO!</font> <br/><br/>";
+					echo "<font color='lime'>Filme $nome atualizado com sucesso!</font> <br/><br/>";
 				} else {
-					echo "<font color='red'>CLIENTE $nome NÃO PODE SER ATUALIZADO! ERROR = ".mysql_error()."</font><br/><br/>";
+					echo "<font color='red'>Filme $nome não pode ser atualizado! ERROR = ".mysql_error()."</font><br/><br/>";
+					echo $sql;
 				}
 			}
+			
 		}
 		
 		echo "
-		<form action='/aksjdji/control/editarFilme.php'>
+		<form action='".$_SERVER['PHP_SELF']."'>
 		<table>
 			<tr>
 				<td>
-					CPF
+					Código
 				</td>
 				<td>
-					<input type='text' name='cpf' value = '$cpf' readonly='readonly'/>
+					<input type='text' name='cod' value = '$cod' readonly='readonly'/>
 				</td>
 			</tr>
 			<tr>
@@ -79,66 +75,100 @@ A:hover {text-decoration:underline;color:#999999;}
 			</tr>
 			<tr>
 				<td>
-					Data de Nascimento
+					Quantidade
 				</td>
 				<td>
-				<select name='dia'>";
-							for($i = 1;$i<=31;$i++){
-								if($i == $dia){
-									echo "<option value='$i' selected>$i</option>";
+					<input type='text' name='qtd' value = '$qtd'/>
+				</td>
+			</tr>";
+			
+			$categorias = array();
+			
+			$result = mysql_query("SELECT cod,nome FROM categorias");
+			while(list($cod,$nome) = mysql_fetch_array($result)){
+				$categorias[] = $cod;
+				$categorias[] = $nome;
+			}
+			if($conexao && $result){
+			echo "
+				<tr>
+					<td>
+						Categoria1
+					</td>
+					<td>
+						<select name='cod_categoria1'>";
+							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
+								if($cod_categoria1 == $categorias[$i]){
+									echo "<option value=$categorias[$i] selected>$categorias[$j]</option>";
 								} else {
-									echo "<option value='$i'>$i</option>";
+									echo "<option value=$categorias[$i]>$categorias[$j]</option>";
 								}
 							}
-						echo '</select>';
-						echo "<select name='mes'>";
-							for($i = 1;$i<=12;$i++){
-								if($i == $mes){
-									echo "<option value='$i' selected>$i</option>";
+							
+						echo "</select>
+					</td>
+				</tr>
+			";
+			echo "
+				<tr>
+					<td>
+						Categoria 2
+					</td>
+					<td>
+						<select name='cod_categoria2'>
+							<option value=null>selecione</option>";
+							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
+								if($cod_categoria2 == $categorias[$i]){
+									echo "<option value=$categorias[$i] selected>$categorias[$j]</option>";
 								} else {
-									echo "<option value='$i'>$i</option>";
+									echo "<option value=$categorias[$i]>$categorias[$j]</option>";
 								}
 							}
-						echo '</select>';	
-						echo "<select name='ano'>";
-							for($i = 1900;$i<=2012;$i++){
-								if($i == $ano){
-									echo "<option value='$i' selected>$i</option>";
+							
+						echo "</select>
+					</td>
+				</tr>
+			";
+			echo "
+				<tr>
+					<td>
+						Categoria 3
+					</td>
+					<td>
+						<select name='cod_categoria3'>
+							<option value=null>selecione</option>";
+							for($i = 0, $j = 1;$j < sizeof($categorias);$i += 2, $j += 2){
+								if($cod_categoria3 == $categorias[$i]){
+									echo "<option value=$categorias[$i] selected>$categorias[$j]</option>";
 								} else {
-									echo "<option value='$i'>$i</option>";
+									echo "<option value=$categorias[$i]>$categorias[$j]</option>";
 								}
 							}
-						echo "
-						<option value='2013' selected>2013</option>;
-						</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Endereço
-				</td>
-				<td>
-					<input type='text' name='endereco' value = '$endereco'/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Telefone
-				</td>
-				<td>
-					<input type='text' name='telefone' value='$telefone' maxlength=10/>
-				</td>
-			</tr>
-			<tr>
+							
+						echo "</select>
+					</td>
+				</tr>
+			";
+			} else {
+				echo "<font color='red'>SQL ERROR = ".mysql_error()."</font>";
+			}
+		
+
+			
+			echo "<tr>
 				<td>
 				</td>
 				<td>
+					<input type='hidden' name='categoria1' value='$cod_categoria1'/>
+					<input type='hidden' name='categoria2' value='$cod_categoria2'/>
+					<input type='hidden' name='categoria3' value='$cod_categoria3'/>
 					<input type='hidden' name='alterar' value='true'/>
 					<button>Salvar</button>
 				</td>
 			</tr>
 		</table>
 		</form>";
+		mysql_close();
 	?>
 </body>
 </html>

@@ -5,7 +5,25 @@ A:visited {text-decoration:none;color:#ffcc33;}
 A:active {text-decoration:none;color:#ff0000;} 
 A:hover {text-decoration:underline;color:#999999;} 
 </STYLE>
-
+<script language="JavaScript">
+ 
+ function mascara(t, mask){
+	var i = t.value.length;
+	var saida = mask.substring(1,0);
+	var texto = mask.substring(i)
+	if (texto.substring(0,1) != saida){
+		t.value += texto.substring(0,1);
+	}
+	
+	var tecla=(window.event)?event.keyCode:t.which;   
+    if((tecla>47 && tecla<58)) return true;
+    else{
+    	if (tecla==8 || tecla==0) return true;
+	else  return false;
+    }
+ }
+ 
+ </script>
 <title>Editar Cliente - Sistema de Locadora de Filmes</title>
 <body>
 	<h1 align="center">Editar Cliente - Sistema de Locadora de Filmes<h1>
@@ -20,6 +38,9 @@ A:hover {text-decoration:underline;color:#999999;}
 		</h5>
 	</div>
 	<?php
+		$conexao = mysql_connect('localhost:3306','root','');
+		mysql_select_db('locadora',$conexao);
+			
 		$cpf = '';
 		$nome = '';
 		$dia = '1';
@@ -31,7 +52,16 @@ A:hover {text-decoration:underline;color:#999999;}
 			$cpf = $_GET['cpf'];
 			$nome = $_GET['nome'];
 			$endereco = $_GET['endereco'];
-			$telefone = $_GET['telefone'];
+			$telefone = '';
+			if(isSet($_GET['ddd'])){
+				$ddd = $_GET['ddd'];
+				$fone = $_GET['fone'];
+				$telefone = $_GET['ddd'] . $_GET['fone'];
+			} else {
+				$telefone = $_GET['telefone'];
+				$ddd = substr($telefone,0,2);
+				$fone = substr($telefone,2);
+			}
 			if(isSet($_GET['data_nascimento'])){
 				$dtN = $_GET['data_nascimento'];
 				$dia = date('d',strtotime($dtN));
@@ -44,10 +74,10 @@ A:hover {text-decoration:underline;color:#999999;}
 			}
 		}
 		if(isSet($_GET['alterar'])){
-			$conexao = mysql_connect('localhost:3306','root','');
-			mysql_select_db('locadora',$conexao);
+			
 			if($conexao){
 				$data_nascimento = $_GET['ano'] . '-' .$_GET['mes'] . '-' .$_GET['dia'];
+				
 				$result = mysql_query("UPDATE clientes SET nome='$nome',data_nascimento='$data_nascimento',
 					endereco='$endereco',telefone='$telefone' WHERE cpf='$cpf'");
 				if($result){
@@ -59,7 +89,7 @@ A:hover {text-decoration:underline;color:#999999;}
 		}
 		
 		echo "
-		<form action='/aksjdji/control/editarCliente.php'>
+		<form action='".$_SERVER['PHP_SELF']."'>
 		<table>
 			<tr>
 				<td>
@@ -126,7 +156,8 @@ A:hover {text-decoration:underline;color:#999999;}
 					Telefone
 				</td>
 				<td>
-					<input type='text' name='telefone' value='$telefone' maxlength=10/>
+					<input type='text' name='ddd' value='$ddd' maxlength=2 size=2 onkeypress=\"return mascara(this,'##')\"/>
+					<input type='text' name='fone' value='$fone' maxlength=8 size=11 onkeypress=\"return mascara(this,'########')\"/>
 				</td>
 			</tr>
 			<tr>
@@ -139,6 +170,7 @@ A:hover {text-decoration:underline;color:#999999;}
 			</tr>
 		</table>
 		</form>";
+		mysql_close();
 	?>
 </body>
 </html>

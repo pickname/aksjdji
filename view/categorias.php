@@ -55,9 +55,15 @@
 				
 				$resultExcluir = mysql_query("DELETE FROM categorias WHERE cod = '$cod'");
 				if($resultExcluir){
-					echo "<font color='lime'>CATEGORIA $nome EXCLUIDO COM SUCESSO!</font> <br/><br/>";
+					echo "<font color='lime'>Categoria $nome deletada com sucesso!</font> <br/><br/>";
 				} else {
-					echo "FALHA NA EXCLUSÃO! " . mysql_error();
+					$erro = mysql_error();
+					$errofk_categoria_esta_sendo_usada = "Cannot delete or update a parent row: a foreign key constraint fails (`locadora`.`filmes`, CONSTRAINT `fk_filmes_categoria1_categorias_cod` FOREIGN KEY (`categoria1`) REFERENCES `categorias` (`cod`))";
+					if($erro == $errofk_categoria_esta_sendo_usada){
+						echo "<font color='red'>Categoria $nome não pode ser deletada existe um ou mais filmes utilizando esta categoria</font> <br/><br/>";
+					} else {
+						echo "FALHA NA EXCLUSÃO! " . mysql_error();
+					}
 				}
 			}
 			$pesq = '';

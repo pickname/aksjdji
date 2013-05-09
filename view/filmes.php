@@ -88,7 +88,8 @@
 		}
 		$pesq = '';
 		$tipoPesq = '';
-		$sql = "SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 
+		$sql = "SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3, f.categoria1 as cod_categoria1,
+				f.categoria2 as cod_categoria2, f.categoria3 as cod_categoria3
 				FROM filmes as f 
 				INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 				LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
@@ -102,7 +103,8 @@
 					
 					if($tipoPesq == 'nome'){
 						$sql = "
-							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 
+							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3, f.categoria1 as cod_categoria1,
+				f.categoria2 as cod_categoria2, f.categoria3 as cod_categoria3
 							FROM filmes as f 
 							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
@@ -110,15 +112,17 @@
 							WHERE f.nome like '$pesq%' ORDER BY f.nome LIMIT 15";
 					} elseif ($tipoPesq == 'cod') {
 						$sql = "
-							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 
+							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3, f.categoria1 as cod_categoria1,
+				f.categoria2 as cod_categoria2, f.categoria3 as cod_categoria3 
 							FROM filmes as f 
 							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
 							LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
-							WHERE f.cod = $pesq ORDER BY f.cod LIMIT 10";
+							WHERE f.cod = '$pesq' ORDER BY f.cod LIMIT 10";
 					} elseif($tipoPesq == 'categoria') {
 						$sql = "
-							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 
+							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 , f.categoria1 as cod_categoria1,
+				f.categoria2 as cod_categoria2, f.categoria3 as cod_categoria3
 							FROM filmes as f 
 							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
@@ -127,7 +131,7 @@
 					}
 				}
 				$result = mysql_query($sql);
-					if($result){
+				if($result){
 									
 					echo "<table border=1>
 					<tr>
@@ -187,13 +191,13 @@
 								</form>
 							</td>
 							<td>
-								<form action='/aksjdji/control/editarCliente.php'>
+								<form action='/aksjdji/control/editarFilme.php'>
 									<input type='hidden' name='cod' value = '".$row['cod']."'/>
 									<input type='hidden' name='nome' value = '".$row['nome']."'/>
 									<input type='hidden' name='qtd' value = '".$row['qtd']."'/>
-									<input type='hidden' name='categoria1' value = '".$row['categoria1']."'/>
-									<input type='hidden' name='categoria2' value = '".$row['categoria2']."'/>
-									<input type='hidden' name='categoria3' value = '".$row['categoria3']."'/>
+									<input type='hidden' name='cod_categoria1' value = '".$row['cod_categoria1']."'/>
+									<input type='hidden' name='cod_categoria2' value = '".$row['cod_categoria2']."'/>
+									<input type='hidden' name='cod_categoria3' value = '".$row['cod_categoria3']."'/>
 									
 									<button>Editar</button>
 								</form>
@@ -208,7 +212,6 @@
 				echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
 			}
 			mysql_close();
-		
 	?>
 </body>
 </html>
