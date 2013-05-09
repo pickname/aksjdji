@@ -52,13 +52,13 @@ A:hover {text-decoration:underline;color:#999999;}
 			$categoria1 = $_GET['categoria1'];
 			$categoria2 = $_GET['categoria2'];
 			$categoria3 = $_GET['categoria3'];
+			$sql = "INSERT INTO filmes (nome,qtd,categoria1,categoria2,categoria3) VALUES ('$nome','$qtd',$categoria1,$categoria2,$categoria3)";
 			
 			if($nome != ''){
 				$conexao = mysql_connect('localhost:3306','root','');
 				mysql_select_db('locadora',$conexao);
 				if($conexao){
-					$result = mysql_query("INSERT INTO filmes (nome,qtd,categoria1,categoria2,categoria3)
-						VALUES ('$nome','$qtd','$categoria1','$categoria2','$categoria3')");
+					$result = mysql_query($sql);
 					if($result){
 						echo "<font color='lime'>$nome cadastro com sucesso!!!</font>";
 					} else {

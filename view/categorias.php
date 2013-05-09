@@ -31,7 +31,7 @@
 				if(isSet($_GET['pesq'])){
 					$pesq = $_GET['pesq'];
 				}
-				echo "<input type='text' name='pesq' value='$pesq'/>";
+				echo "<input type='text' name='pesq' value='$pesq' autofocus/>";
 				
 			?>
 			

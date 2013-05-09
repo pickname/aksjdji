@@ -28,38 +28,37 @@
 			<?php
 				$tipoPesq = '';
 				$pesq = '';
-				if(isSet($_GET['tipoPesq'])){
-					$tipoPesq = $_GET['tipoPesq'];
-				}
+				
 				if(isSet($_GET['pesq'])){
 					$pesq = $_GET['pesq'];
+					$tipoPesq = $_GET['tipoPesq'];
 				}
 					switch($tipoPesq){
 						case 'cod':{
 						echo '
 							<input type="radio" name="tipoPesq" value = "nome"/>Nome
 							<input type="radio" name="tipoPesq" value = "cod" checked="checked"/>Código 
-							<input type="radio" name="tipoPesq" value = "qtd"/>Categoria <br/>';
+							<input type="radio" name="tipoPesq" value = "categoria"/>Categoria <br/>';
 							break;
 						}
-						case 'qtd':{
+						case 'categoria':{
 						echo '
 							<input type="radio" name="tipoPesq" value = "nome"/>Nome
 							<input type="radio" name="tipoPesq" value = "cod"/>Código
-							<input type="radio" name="tipoPesq" value = "qtd" checked="checked"/>Categoria <br/>';	
+							<input type="radio" name="tipoPesq" value = "categoria" checked="checked"/>Categoria <br/>';	
 							break;
 						}
 						default:{
 							echo '
 							<input type="radio" name="tipoPesq" value = "nome" checked="checked"/>Nome
 							<input type="radio" name="tipoPesq" value = "cod"/>Código 
-							<input type="radio" name="tipoPesq" value = "qtd"/>Categoria <br/>';
+							<input type="radio" name="tipoPesq" value = "categoria"/>Categoria <br/>';
 							break;
 						}
 					}
 				
 				
-				echo "<input type='text' name='pesq' value='$pesq'/>";
+				echo "<input type='text' name='pesq' value='$pesq' autofocus/>";
 				
 			?>
 			
@@ -69,7 +68,6 @@
 	</form>
 	</div>
 	<a href="/aksjdji/control/cadastrarFilme.php"><button>Novo Filme</button></a>
-	<a href="/aksjdji/control/cadastrarCategoria.php"><button>Nova Categoria</button></a>
 	<hr/>
 	
 	<?php
@@ -78,101 +76,131 @@
 			
 		if(isSet($_GET['cod'])){
 			$cod = $_GET['cod'];
+			$nome = $_GET['nome'];
 			
 			$resultExcluir = mysql_query("DELETE FROM filmes WHERE cod = '$cod'");
 			if($resultExcluir){
-				echo "<font color='lime'>CLIENTE $cod EXCLUIDO COM SUCESSO!</font> <br/><br/>";
+				echo "<font color='lime'>Filme $nome deletado com sucesso!</font> <br/><br/>";
 			} else {
 				echo "FALHA NA EXCLUSÃO! " . mysql_error();
 			}
 		
 		}
-		if(isSet($_GET['pesq'])){
-			$pesq = $_GET['pesq'];
-			$tipoPesq = $_GET['tipoPesq'];
-			
-			if($conexao){
-				$result;
-				if($tipoPesq == 'nome'){
-					$result = mysql_query("SELECT cod,nome,qtd,categoria1,categoria2,categoria3
-					FROM filmes WHERE $tipoPesq like '$pesq%' ORDER BY $tipoPesq LIMIT 15");
-				} else {
-					$result = mysql_query("SELECT cod,nome,qtd,categoria1,categoria2,categoria3
-					FROM filmes WHERE $tipoPesq = '$pesq' LIMIT 10");
+		$pesq = '';
+		$tipoPesq = '';
+		$sql = "SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 
+				FROM filmes as f 
+				INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
+				LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
+				LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
+				ORDER BY nome LIMIT 15";
+		
+		if($conexao){
+				if(isSet($_GET['pesq']) && $_GET['pesq'] != ''){
+					$pesq = $_GET['pesq'];
+					$tipoPesq = $_GET['tipoPesq'];
+					
+					if($tipoPesq == 'nome'){
+						$sql = "
+							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 
+							FROM filmes as f 
+							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
+							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
+							LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
+							WHERE f.nome like '$pesq%' ORDER BY f.nome LIMIT 15";
+					} elseif ($tipoPesq == 'cod') {
+						$sql = "
+							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 
+							FROM filmes as f 
+							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
+							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
+							LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
+							WHERE f.cod = $pesq ORDER BY f.cod LIMIT 10";
+					} elseif($tipoPesq == 'categoria') {
+						$sql = "
+							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 
+							FROM filmes as f 
+							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
+							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
+							LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
+							WHERE c1.nome like '$pesq%' or c2.nome like '$pesq%' or c3.nome like '$pesq%' ORDER BY f.nome LIMIT 10";
+					}
 				}
-				if($result){
-								
-				echo "<table border=1>
-				<tr>
-					<td>
-						<b>Código</b>
-					</td>
-					<td>
-						<b>Nome</b>
-					</td>
-					<td>
-						<b>Quantidade</b>
-					</td>
-					<td>
-						<b>Categoria1</b>
-					</td>
-					<td>
-						<b>Categoria2</b>
-					</td>
-					<td>
-						<b>Categoria3</b>
-					</td>
-					<td>
-						<b>Delete</b>
-					</td>
-					<td>
-						<b>Editar</b>
-					</td>
-				</tr>";
-				while($row = mysql_fetch_array($result)){
-					echo "
+				$result = mysql_query($sql);
+					if($result){
+									
+					echo "<table border=1>
 					<tr>
 						<td>
-							".$row['cod']."
+							<b>Código</b>
 						</td>
 						<td>
-							".$row['nome']."
+							<b>Nome</b>
 						</td>
 						<td>
-							".$row['qtd']."
+							<b>Quantidade</b>
 						</td>
 						<td>
-							".$row['categoria1']."
+							<b>Categoria1</b>
 						</td>
 						<td>
-							".$row['categoria2']."
+							<b>Categoria2</b>
 						</td>
 						<td>
-							".$row['categoria3']."
+							<b>Categoria3</b>
 						</td>
 						<td>
-							<form action='".$_SERVER['PHP_SELF']."'>
-								<input type='hidden' name='cod' value = '".$row['cod']."'/>
-								<input type='hidden' name='pesq' value = '".$_GET['pesq']."'/>
-								<input type='hidden' name='tipoPesq' value = '".$_GET['tipoPesq']."'/>
-								<button>Delete</button>
-							</form>
+							<b>Delete</b>
 						</td>
 						<td>
-							<form action='/aksjdji/control/editarCliente.php'>
-								<input type='hidden' name='cod' value = '".$row['cod']."'/>
-								<input type='hidden' name='nome' value = '".$row['nome']."'/>
-								<input type='hidden' name='qtd' value = '".$row['qtd']."'/>
-								<input type='hidden' name='categoria1' value = '".$row['categoria1']."'/>
-								<input type='hidden' name='categoria2' value = '".$row['categoria2']."'/>
-								<input type='hidden' name='categoria3' value = '".$row['categoria3']."'/>
-								
-								<button>Editar</button>
-							</form>
+							<b>Editar</b>
 						</td>
 					</tr>";
-				}
-				echo '</table>';
+					while($row = mysql_fetch_array($result)){
+						echo "
+						<tr>
+							<td>
+								".$row['cod']."
+							</td>
+							<td>
+								".$row['nome']."
+							</td>
+							<td>
+								".$row['qtd']."
+							</td>
+							<td>
+								".$row['categoria1']."
+							</td>
+							<td>
+								".$row['categoria2']."
+							</td>
+							<td>
+								".$row['categoria3']."
+							</td>
+							<td>
+								<form action='".$_SERVER['PHP_SELF']."'>
+									<input type='hidden' name='cod' value = '".$row['cod']."'/>
+									<input type='hidden' name='nome' value = '".$row['nome']."'/>
+									<input type='hidden' name='pesq' value = '".$pesq."'/>
+									<input type='hidden' name='tipoPesq' value = '".$tipoPesq."'/>
+									<button>Delete</button>
+								</form>
+							</td>
+							<td>
+								<form action='/aksjdji/control/editarCliente.php'>
+									<input type='hidden' name='cod' value = '".$row['cod']."'/>
+									<input type='hidden' name='nome' value = '".$row['nome']."'/>
+									<input type='hidden' name='qtd' value = '".$row['qtd']."'/>
+									<input type='hidden' name='categoria1' value = '".$row['categoria1']."'/>
+									<input type='hidden' name='categoria2' value = '".$row['categoria2']."'/>
+									<input type='hidden' name='categoria3' value = '".$row['categoria3']."'/>
+									
+									<button>Editar</button>
+								</form>
+							</td>
+						</tr>";
+					}
+					echo '</table>';
 				} else {
 					echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
 				}
@@ -180,7 +208,7 @@
 				echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
 			}
 			mysql_close();
-		}
+		
 	?>
 </body>
 </html>

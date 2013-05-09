@@ -59,7 +59,7 @@
 					}
 				
 				
-				echo "<input type='text' name='pesq' value='$pesq'/>";
+				echo "<input type='text' name='pesq' value='$pesq' autofocus/>";
 				
 			?>
 			
@@ -87,83 +87,90 @@
 			}
 		
 		}
+		
+		$pesq = '';
+		$tipoPesq = '';
+			
 		if(isSet($_GET['pesq'])){
 			$pesq = $_GET['pesq'];
 			$tipoPesq = $_GET['tipoPesq'];
-			
-			if($conexao){
-				$result;
-				if($tipoPesq == 'nome'){
-					$result = mysql_query("SELECT cpf,nome,data_nascimento,endereco,telefone
-					FROM clientes WHERE $tipoPesq like '$pesq%' ORDER BY $tipoPesq LIMIT 15");
-				} else {
-					$result = mysql_query("SELECT cpf,nome,data_nascimento,endereco,telefone
-					FROM clientes WHERE $tipoPesq = '$pesq' LIMIT 10");
-				}
-				if($result){
-								
-				echo "<table border=1>
+		}
+		if($conexao){
+			$result;
+			if($pesq == ''){
+				$result = mysql_query("SELECT cpf,nome,data_nascimento,endereco,telefone
+				FROM clientes ORDER BY nome LIMIT 15");
+			} elseif($tipoPesq == 'nome'){
+				$result = mysql_query("SELECT cpf,nome,data_nascimento,endereco,telefone
+				FROM clientes WHERE $tipoPesq like '$pesq%' ORDER BY $tipoPesq LIMIT 15");
+			} else {
+				$result = mysql_query("SELECT cpf,nome,data_nascimento,endereco,telefone
+				FROM clientes WHERE $tipoPesq = '$pesq' LIMIT 10");
+			}
+			if($result){
+							
+			echo "<table border=1>
+			<tr>
+				<td>
+					<b>CPF</b>
+				</td>
+				<td>
+					<b>Nome</b>
+				</td>
+				<td>
+					<b>Data Nascimento</b>
+				</td>
+				<td>
+					<b>Endereco</b>
+				</td>
+				<td>
+					<b>Telefone</b>
+				</td>
+				<td>
+					<b>Delete</b>
+				</td>
+				<td>
+					<b>Editar</b>
+				</td>
+			</tr>";
+			while($row = mysql_fetch_array($result)){
+				echo "
 				<tr>
 					<td>
-						<b>CPF</b>
+						".$row['cpf']."
 					</td>
 					<td>
-						<b>Nome</b>
+						".$row['nome']."
 					</td>
 					<td>
-						<b>Data Nascimento</b>
+						".date("d-m-Y", strtotime($row['data_nascimento']))."
 					</td>
 					<td>
-						<b>Endereco</b>
+						".$row['endereco']."
 					</td>
 					<td>
-						<b>Telefone</b>
+						".$row['telefone']."
 					</td>
 					<td>
-						<b>Delete</b>
+						<form action='".$_SERVER['PHP_SELF']."'>
+						<input type='hidden' name='cpf' value = '".$row['cpf']."'/>
+							<input type='hidden' name='pesq' value = '$pesq'/>
+							<input type='hidden' name='tipoPesq' value = '$tipoPesq'/>
+							<button>Delete</button>
+						</form>
 					</td>
 					<td>
-						<b>Editar</b>
+						<form action='/aksjdji/control/editarCliente.php'>
+							<input type='hidden' name='cpf' value = '".$row['cpf']."'/>
+							<input type='hidden' name='nome' value = '".$row['nome']."'/>
+							<input type='hidden' name='data_nascimento' value = '".$row['data_nascimento']."'/>
+							<input type='hidden' name='endereco' value = '".$row['endereco']."'/>
+							<input type='hidden' name='telefone' value = '".$row['telefone']."'/>
+							
+							<button>Editar</button>
+						</form>
 					</td>
 				</tr>";
-				while($row = mysql_fetch_array($result)){
-					echo "
-					<tr>
-						<td>
-							".$row['cpf']."
-						</td>
-						<td>
-							".$row['nome']."
-						</td>
-						<td>
-							".date("d-m-Y", strtotime($row['data_nascimento']))."
-						</td>
-						<td>
-							".$row['endereco']."
-						</td>
-						<td>
-						".$row['telefone']."
-						</td>
-						<td>
-							<form action='".$_SERVER['PHP_SELF']."'>
-								<input type='hidden' name='cpf' value = '".$row['cpf']."'/>
-								<input type='hidden' name='pesq' value = '".$_GET['pesq']."'/>
-								<input type='hidden' name='tipoPesq' value = '".$_GET['tipoPesq']."'/>
-								<button>Delete</button>
-							</form>
-						</td>
-						<td>
-							<form action='/aksjdji/control/editarCliente.php'>
-								<input type='hidden' name='cpf' value = '".$row['cpf']."'/>
-								<input type='hidden' name='nome' value = '".$row['nome']."'/>
-								<input type='hidden' name='data_nascimento' value = '".$row['data_nascimento']."'/>
-								<input type='hidden' name='endereco' value = '".$row['endereco']."'/>
-								<input type='hidden' name='telefone' value = '".$row['telefone']."'/>
-								
-								<button>Editar</button>
-							</form>
-						</td>
-					</tr>";
 				}
 				echo '</table>';
 				} else {
@@ -173,7 +180,7 @@
 				echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
 			}
 			mysql_close();
-		}
+		
 	?>
 </body>
 </html>
