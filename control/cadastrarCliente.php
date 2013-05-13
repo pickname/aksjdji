@@ -6,14 +6,6 @@ A:active {text-decoration:none;color:#ff0000;}
 A:hover {text-decoration:underline;color:#999999;} 
 </STYLE>
 <script language="JavaScript">
- function somenteNumero(o){
-	var v = o.value;
-	v=v.replace(/\D/g,"");             //Remove tudo o que não é dígito
-    //v=v.replace(/^(\d{2})(\d)/g,"($1) $2"); //Coloca parênteses em volta dos dois primeiros dígitos
-    //v=v.replace(/(\d)(\d{4})$/,"$1-$2");    //Coloca hífen entre o quarto e o quinto dígitos
-    o.value = v;
- }
- 
  function mascara(t, mask){
 	var i = t.value.length;
 	var saida = mask.substring(1,0);
@@ -62,7 +54,16 @@ A:hover {text-decoration:underline;color:#999999;}
 					if($result){
 						echo "<font color='lime'>$nome cadastro com sucesso!!!</font>";
 					} else {
-						echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
+						$error = mysql_error();
+						$error = substr($error,0,strlen('Duplicate entry'));
+						$duplicadaPK = "Duplicate entry";	
+							
+						}
+						if($error == $duplicadaPK){
+							echo "<font color='red'>O CPF $cpf já existe!</font>";
+						} else {
+							echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
+						}
 					}
 				} else {
 					echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
@@ -71,8 +72,6 @@ A:hover {text-decoration:underline;color:#999999;}
 			} else {
 				echo "<font color='red'>CPF é obrigatório!!!</font>";
 			}
-			
-		}
 	?>
 	
 	<form action='/aksjdji/control/cadastrarCliente.php'>

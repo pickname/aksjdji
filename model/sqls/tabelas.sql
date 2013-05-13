@@ -4,8 +4,6 @@ CREATE TABLE categorias2 (
 	UNIQUE (nome)
 );
 
-
-
 CREATE TABLE filmes (
 	cod INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	nome VARCHAR(45) NOT NULL,
@@ -32,8 +30,9 @@ CREATE TABLE clientes (
 CREATE TABLE locacoes (
 	cod INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	cpf_cliente VARCHAR(14) NOT NULL,
-	data_locacao DATE NOT NULL,
-	data_entrega DATE,
+	data_locacao TIMESTAMP NOT NULL,
+	data_entrega_prevista DATE NOT NULL,
+	data_entrega TIMESTAMP,
 	qtd_filmes INT NOT NULL DEFAULT 1,
 	valor DEC(10,2),
 	CONSTRAINT fk_locacoes_cpf_cliente_clientes_cpf
