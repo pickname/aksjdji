@@ -1,77 +1,51 @@
+<?php 
+include '../style.php'; 
+include '../js.php';
+?>
 <html>
-<STYLE type="text/css"> 
-A:link {text-decoration:none;color:#ffcc33;} 
-A:visited {text-decoration:none;color:#ffcc33;} 
-A:active {text-decoration:none;color:#ff0000;} 
-A:hover {text-decoration:underline;color:#999999;} 
-</STYLE>
-<script language="JavaScript">
- function mascara(t, mask){
-	var i = t.value.length;
-	var saida = mask.substring(1,0);
-	var texto = mask.substring(i)
-	if (texto.substring(0,1) != saida){
-		t.value += texto.substring(0,1);
-	}
-	
-	var tecla=(window.event)?event.keyCode:t.which;   
-    if((tecla>47 && tecla<58)) return true;
-    else{
-    	if (tecla==8 || tecla==0) return true;
-	else  return false;
-    }
- }
- 
- </script>
 
 <title>Cadastrar Cliente - Sistema de Locadora de Filmes</title>
 <body>
 	<h1 align="center">Cadastrar Cliente - Sistema de Locadora de Filmes<h1>
 	
-	<div style="background-color:black">
-		<h5>
-			<a href="/aksjdji">Início</a>
-			<a href="/aksjdji/view/clientes.php">Clientes</a>
-			<a href="/aksjdji/view/filmes.php">Filmes</a>
-			<a href="/aksjdji/view/categorias.php">Categorias</a>
-			<a href="/aksjdji/view/locacoes.php">Locações</a>
-		</h5>
-	</div>
+	<?php include '../menu.php';?>	
+	
 	<?php
-		if(isSet($_GET['cpf'])){
-			$cpf = $_GET['cpf'];
-			$nome = $_GET['nome'];
-			$data_nascimento = $_GET['ano'] . '-' . $_GET['mes'] . '-' . $_GET['dia'];
-			$endereco = $_GET['endereco'];
-			$fone = $_GET['ddd'] . "" .$_GET['telefone'];
-			
-			if($cpf != ''){
-				$conexao = mysql_connect('localhost:3306','root','');
-				mysql_select_db('locadora',$conexao);
-				if($conexao){
-					$result = mysql_query("INSERT INTO clientes (cpf,nome,data_nascimento,endereco,telefone)
-						VALUES ('$cpf','$nome','$data_nascimento','$endereco','$fone')");
-					if($result){
-						echo "<font color='lime'>$nome cadastro com sucesso!!!</font>";
-					} else {
-						$error = mysql_error();
-						$error = substr($error,0,strlen('Duplicate entry'));
-						$duplicadaPK = "Duplicate entry";	
-							
-						}
-						if($error == $duplicadaPK){
-							echo "<font color='red'>O CPF $cpf já existe!</font>";
+			if(isSet($_GET['cpf'])){
+				$cpf = $_GET['cpf'];
+				$nome = $_GET['nome'];
+				$data_nascimento = $_GET['ano'] . '-' . $_GET['mes'] . '-' . $_GET['dia'];
+				$endereco = $_GET['endereco'];
+				$fone = $_GET['ddd'] . "" .$_GET['telefone'];
+				
+				if($cpf != ''){
+					$conexao = mysql_connect('localhost:3306','root','');
+					mysql_select_db('locadora',$conexao);
+					if($conexao){
+						$result = mysql_query("INSERT INTO clientes (cpf,nome,data_nascimento,endereco,telefone)
+							VALUES ('$cpf','$nome','$data_nascimento','$endereco','$fone')");
+						if($result){
+							echo "<font color='lime'>$nome cadastro com sucesso!!!</font>";
 						} else {
-							echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
+							$error = mysql_error();
+							$error = substr($error,0,strlen('Duplicate entry'));
+							$duplicadaPK = "Duplicate entry";	
+						
+							if($error == $duplicadaPK){
+								echo "<font color='red'>O CPF $cpf já existe!</font>";
+							} else {
+								echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
+							}
 						}
+					} else {
+						echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
 					}
+					mysql_close();
 				} else {
-					echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
+					echo "<font color='red'>CPF é obrigatório!!!</font>";
 				}
-				mysql_close();
-			} else {
-				echo "<font color='red'>CPF é obrigatório!!!</font>";
-			}
+				
+			} 
 	?>
 	
 	<form action='/aksjdji/control/cadastrarCliente.php'>

@@ -1,174 +1,87 @@
+<?php 
+include '../style.php'; 
+include '../js.php';
+?>
+
 <html>
-<STYLE type="text/css"> 
-A:link {text-decoration:non	e;color:#ffcc33;} 
-A:visited {text-decoration:none;color:#ffcc33;} 
-A:active {text-decoration:none;color:#ff0000;} 
-A:hover {text-decoration:underline;color:#999999;} 
-
-div#geral {
-	
-}
-
-div#pesq_geral {
-	margin: 0 auto;
-	
-}
-
-div#divisao {
-	background-color: red;
-	border-right: 2px solid white;
-}
-
-div#pesquisa {
-	background-color: green;
-	
-}
-div#dados_locacao {
-	background-color: pink;
-	float: left;
-	width: 400px; 	
-	border-right: 2px solid white;
-}
-div#pesquisa_filmes {
-	height: 250px;
-	background-color: #09f; /* Azul */
-}
-div#filmes_locados {
-	background-color: #090; /* Verde */
-	border-top: 1px solid #f00;
-}
-
-</STYLE>
-<script language="JavaScript">
- function mascara(t, mask){
-	var i = t.value.length;
-	var saida = mask.substring(1,0);
-	var texto = mask.substring(i)
-	if (texto.substring(0,1) != saida){
-		t.value += texto.substring(0,1);
-	}
-	var tecla=(window.event)?event.keyCode:t.which;   
-    if((tecla>47 && tecla<58)) return true;
-    else{
-    	if (tecla==8 || tecla==0) return true;
-	else  return false;
-    }
- }
- 
- </script>
-
-
 <title>Cadastrar Locação - Sistema de Locadora de Filmes</title>
 <body>
 	<h1 align="center">Cadastrar Locação - Sistema de Locadora de Filmes<h1>
 	
-	<div style="background-color:black">
-		<h5>
-			<a href="/aksjdji">Início</a>
-			<a href="/aksjdji/view/clientes.php">Clientes</a>
-			<a href="/aksjdji/view/filmes.php">Filmes</a>
-			<a href="/aksjdji/view/categorias.php">Categorias</a>
-			<a href="/aksjdji/view/locacoes.php">Locações</a>
-		</h5>
-	</div> 
-	<?php
+	<?php include '../menu.php';
+
+		session_start();
+		
+		// exibe qualquer erro gerado durante qualquer evento
+		if(isset($_SESSION['resposta'])){
+			echo $_SESSION['resposta'].'<br/>';
+			unset($_SESSION['resposta']);
+		}
+		
+		
 		$conexao = mysql_connect('localhost:3306','root','');
 		mysql_select_db('locadora',$conexao);
 		if(!$conexao){
 			echo "<font color='red'>SQL ERROR = ".mysql_error()."</font>";
 		}
 		
-		setlocale(LC_TIME, 'pt_BR', 'pt_BR iso-8859-1', 'pt_BR.utf-8', 'portuguese');
-		date_default_timezone_set('America/Sao_Paulo');
-		
-		$cpf_cliente = 'xxx.xxx.xxx.xx';
-		$nome_cliente = 'Cliente';
+		$cpf_cliente = '';
+		$nome_cliente = '';
 		$data_locacao = date('d-m-Y H:i:s');
 		$data_entrega_prevista = date('d-m-Y',strtotime($data_locacao.'+1 day'));
 		$dia_entrega_prevista = date('d',strtotime($data_entrega_prevista));
 		$mes_entrega_prevista = date('m',strtotime($data_entrega_prevista));
 		$ano_entrega_prevista = date('Y',strtotime($data_entrega_prevista));
+		
 		$qtd_filmes = 0;
 		$valor = 0;
-		if(isSet($_GET['pesqCpf'])){
-			$pesqCpf = $_GET['pesqCpf'];
-			$sql = "SELECT cpf,nome FROM clientes WHERE cpf = '$pesqCpf'";
-			$result = mysql_query($sql);
-			if($result){
-				$cliente = mysql_fetch_array($result);
-				if($cliente['cpf'] != ''){
-					$cpf_cliente = $cliente['cpf'];
-					$nome_cliente = $cliente['nome']; 
-				}
-			} else {
-				echo "ERRO ao selecionar o cliente " . mysql_error();
-			}
-		}
 		
-		if(isSet($_GET['nome'])){
-			$nome = $_GET['nome'];
-			
-			if($nome != ''){
-				if($conexao){
-					$result = mysql_query("INSERT INTO categorias (nome) VALUES ('$nome')");
-					if($result){
-						echo "<font color='lime'>$nome cadastro com sucesso!!!</font>";
-						
-					} else {
-						if("Duplicate entry" == substr(mysql_error(),0, strlen('Duplicate entry'))){
-							echo "<font color='red'> A categoria ".$_GET['nome']." já existe</font>";
-						} else {	
-							echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
-						}
-						
-					}
-				} else {
-					echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
-				}
-				
-			} else {
-				echo "<font color='red'>Campo nome é obrigatório!!!</font>";
-			}
-			
-		}
+		$pesqCpf = '';
+		$pesqFilme = '';
 		
-		// verifica se o cliente já foi selecionado caso o usuário tente adicionar o filme antes de selecionar o cliente
-		if(isSet($_GET['pesqFilme']) && $cpf_cliente == 'xxx.xxx.xxx.xx'){
-			
-				echo "<font color='red'>Selecione o cliente primeiro!</font>";
-			
+		if(isset($_SESSION['cliente'])){
+			$cpf_cliente = $_SESSION['cliente'][0];
+			$nome_cliente = $_SESSION['cliente'][1];
 		}
-	echo "<div id='pesquisa'>
+		if(isset($_SESSION['filmesLocados']['size'])){
+			$qtd_filmes = $_SESSION['filmesLocados']['size'];
+			$valor = $qtd_filmes * 2;
+		}
+		// alerta caso o usuario tente adicionar um filme sem adicionar o cliente
+		if(isSet($_GET['pesqFilme']) && $cpf_cliente == 'xxx.xxx.xxx-xx'){
+			echo "<font color='red'>Selecione o cliente primeiro!</font>";
+		} 
+		
+		
+		echo "<div id='pesquisa'>
 		<table>
 			<tr>
 				<td>
-					<form action = '".$_SERVER['PHP_SELF']."'>
+					<form action = '../model/selecionaCliente.php'>
 							
 						<b>CPF do Cliente:</b>";
 							// formulario de pesquisar cpf
-							$pesqCpf = '';
-							if(isSet($_GET['pesqCpf'])){
-								$pesqCpf = $_GET['pesqCpf'];
+							if(isset($_SESSION['cliente'])){
+								echo "<input type='text' name='pesqCpf' value='$cpf_cliente' onkeypress=\"return mascara(this,'###.###.###-##')\" maxlength = '14'/>";
+							} else {
+								echo "<input type='text' name='pesqCpf' onkeypress=\"return mascara(this,'###.###.###-##')\" maxlength = '14' autofocus/>";
 							}
-							echo "<input type='text' name='pesqCpf' value='$pesqCpf' onkeypress=\"return mascara(this,'###.###.###-##')\" maxlength = '14' autofocus/>
-							
-						
+						echo "
 						<button>Selecionar</button>
 					</form>
 				</td>
 				<td width=36>
 				</td>
 				<td>
-					<form action = '".$_SERVER['PHP_SELF']."'>
+					<form action = '../model/selecionaFilme.php'>
 							<b>Pesquisar Filme por:</b>";
 							// formulario de pesquisar filmes
 								$tipoPesq = '';
 								$pesqFilme = '';
 								
-								if(isSet($_GET['pesqFilme']) && $cpf_cliente != 'xxx.xxx.xxx.xx'){
-									
-									$pesqFilme = $_GET['pesqFilme'];
-									$tipoPesq = $_GET['tipoPesq'];
+								if(isSet($_SESSION['cliente']) && isSet($_SESSION['pesqFilme'])){
+										
+									$tipoPesq = $_SESSION['pesqFilme']['tipoPesq'];
 								
 									switch($tipoPesq){
 										case 'cod':{
@@ -205,8 +118,7 @@ div#filmes_locados {
 								}
 								
 								echo "
-								
-							<button>Pesquisar</button>
+								<button>Pesquisar</button>
 					</form>
 				</td>
 			</tr>
@@ -215,8 +127,8 @@ div#filmes_locados {
 	
 		<div id='dados_locacao'>";
 			
-				
-				echo "<form action='".$_SERVER['PHP_SELF']."'>
+				// dados da locação
+				echo "<form action='registrarLocacao.php'>
 				<table>
 					<tr>
 						<td>
@@ -240,6 +152,7 @@ div#filmes_locados {
 						</td>
 						<td>
 							<b><font size=5>$data_locacao</font></b>
+							<input type='hidden' name='data_locacao' value='$data_locacao'>
 						</td>
 					</tr>
 					<tr>
@@ -289,6 +202,7 @@ div#filmes_locados {
 						<td><b><font size=5>";
 							echo number_format($valor,2,',','.');
 						echo "</font></b></td>
+						<input type='hidden' name='valor' value='$valor'/>
 					</tr>
 					<tr>
 						<td>
@@ -301,29 +215,110 @@ div#filmes_locados {
 				</table>
 				</form>";
 				
-			
+		// FILMES PESQUISADOS
 		echo "</div>
-		<div id='pesquisa_filmes'>
+		<div id='pesquisa_filmes' height=550px;>
+			<b>Filme</b>";
 			
-						<b>Filme</b>
-			
-			
-		<table border=1>";
-		
-			for($i = 0; $i < 6; $i++){
-				echo "<tr><td>TESTE $i </td></tr>";
-			}
-		
+			echo "<table border=1>
+					<tr>
+						<td>
+							<b>Código</b>
+						</td>
+						<td>
+							<b>Nome</b>
+						</td>
+						<td>
+							<b>Quantidade</b>
+						</td>
+						<td>
+							<b>Categoria1</b>
+						</td>
+						<td>
+							<b>Categoria2</b>
+						</td>
+						<td>
+							<b>Categoria3</b>
+						</td>
+						<td>
+							<b>Adicionar</b>
+						</td>
+					</tr>";
+			if(isSet($_SESSION['pesqFilme']['result'])){
+				$size = $_SESSION['pesqFilme']['size'];
+				for($i = 0; $i < $size = $_SESSION['pesqFilme']['size']; $i++){
+				
+					$filmes = $_SESSION['pesqFilme']['result'][$i];
+						
+					echo "<tr>
+							<td>
+								".$filmes[0]."
+							</td>
+							<td>
+								".$filmes[1]."
+							</td>
+							<td>
+								".$filmes[2]."
+							</td>
+							<td>
+								".$filmes[3]."
+							</td>
+							<td>
+								".$filmes[4]."
+							</td>
+							<td>
+								".$filmes[5]."
+							</td>
+							<td>
+								<form action='../model/addFilmeLocacao.php' method='get'>
+									<input type='hidden' name='codFilme' value = '".$filmes[0]."'/>
+									<button>Adicionar</button>
+								</form>
+							</td>
+							
+						</tr>";
+						
+					}
+					echo '</table>';
+					
+				}
+					
 		echo "</table>
 		</div>
 	</div>
 	Filmes Selecionado
 	<div id='filmes_locados'>
 		<table border=1>";
-		
-			for($i = 0; $i < 20; $i++){
-				echo "<tr><td>TESTE $i </td></tr>";
-			}
+			
+			echo "<tr>
+					<td>
+						<b>Código</b>
+					</td>
+					<td>
+						<b>Filme</b>
+					</td>
+					<td>
+						<b>Remover</b>
+					</td>
+				</tr>";	
+			if(isset($_SESSION['filmesLocados'])){
+				for($i = 0; $i < $_SESSION['filmesLocados']['size']; $i++){
+					echo "<tr>
+							<td>".
+								$_SESSION['filmesLocados'][$i]['cod']
+							."</td>
+							<td>".
+								$_SESSION['filmesLocados'][$i]['nome']
+							."</td>
+							<td>
+								<form action='../model/removeFilmeLocacao.php'>
+									<input type='hidden' name='position' value='$i'/>
+									<button>Remover</button>
+								</form>
+							</td>
+						</tr>";	
+				}
+			}			
 			
 			mysql_close();
 		?>

@@ -1,24 +1,12 @@
+<?php include '../style.php'; ?>
 <html>
-<STYLE type="text/css"> 
-A:link {text-decoration:none;color:#ffcc33;} 
-A:visited {text-decoration:none;color:#ffcc33;} 
-A:active {text-decoration:none;color:#ff0000;} 
-A:hover {text-decoration:underline;color:#999999;} 
-</STYLE>
 
 <title>Editar Filme - Sistema de Locadora de Filmes</title>
 <body>
 	<h1 align="center">Editar Filme - Sistema de Locadora de Filmes<h1>
 	
-	<div style="background-color:black">
-		<h5>
-			<a href="/aksjdji">Início</a>
-			<a href="/aksjdji/view/clientes.php">Clientes</a>
-			<a href="/aksjdji/view/filmes.php">Filmes</a>
-			<a href="/aksjdji/view/categorias.php">Categorias</a>
-			<a href="/aksjdji/view/locacoes.php">Locações</a>
-		</h5>
-	</div>
+	<?php include '../menu.php';?>	
+	
 	<?php
 		$conexao = mysql_connect('localhost:3306','root','');
 		mysql_select_db('locadora',$conexao);

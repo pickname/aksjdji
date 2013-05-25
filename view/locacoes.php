@@ -1,39 +1,41 @@
+<?php 
+include '../style.php';
+include '../js.php'; ?>
+
+
 <html>
-<STYLE type="text/css"> 
-	A:link {text-decoration:none;color:#ffcc33;} 
-	A:visited {text-decoration:none;color:#ffcc33;} 
-	A:active {text-decoration:none;color:#ff0000;} 
-	A:hover {text-decoration:underline;color:#999999;} 
-</STYLE>
 
 <title>Locações - Sistema de Locadora de Filmes</title>
 <body>
 	
 	<h1 align="center">Locações - Sistema de Locadora de Filmes<h1>
 	
-	<div style="background-color:black">
-		<h5>
-			<a href="/aksjdji">Início</a>
-			<a href="/aksjdji/view/clientes.php">Clientes</a>
-			<a href="/aksjdji/view/filmes.php">Filmes</a>
-			<a href="/aksjdji/view/categorias.php">Locações</a>
-			<a href="/aksjdji/view/locacoes.php">Locações</a>
-		</h5>
-	</div>
-	
-	<div style="background-color:green">
-	<form action = "/aksjdji/view/categorias.php">
-		<h6>
-			<b>Pesquisar:</b>
-			<?php
+	<?php 
+		include '../menu.php';
+
+		session_start();
+		if(isset($_SESSION['resposta'])){
+			echo $_SESSION['resposta'].'<br/>';
+			unset($_SESSION['resposta']);
+		}
+		
+		echo "<div style='background-color:green'>
+		<form action = '".$_SERVER['PHP_SELF']."'>
+		<h6>";
+			if(isset($_GET['fechados']) && $_GET['fechados'] == true){
+				echo "<input type='checkbox' name='fechados' value='true' checked/>Incluir Locação Encerradas</br></br>";
+			} else {
+				echo "<input type='checkbox' name='fechados' value='true'/>Incluir Locação Encerradas</br></br>";
+			}
+		echo "<b>CPF do cliente:</b>";
+			
 				$pesq = '';
 				
 				if(isSet($_GET['pesq'])){
 					$pesq = $_GET['pesq'];
 				}
-				echo "<input type='text' name='pesq' value='$pesq' autofocus/>";
+			echo "<input type='text' name='pesq' value='$pesq' onkeypress=\"return mascara(this,'###.###.###-##')\" maxlength = '14' autofocus/>
 				
-			?>
 			
 			<button>Pesquisar</button>
 			
@@ -41,51 +43,68 @@
 	</form>
 	</div>
 	
-	<a href="/aksjdji/control/cadastrarLocacao.php"><button>Nova Locação</button></a>
+	<a href='/aksjdji/control/novaLocacao.php'><button>Nova Locação</button></a>";
 	
-	<hr/>
-	<?php
+		if(isset($_SESSION['cliente'])){
+			echo "<a href='/aksjdji/control/cadastrarLocacao.php'><button>Continuar Locação Anterior</button></a>";
+		}
+		echo "<hr/>";
+	
+	
 		$conexao = mysql_connect('localhost:3306','root','');
 		mysql_select_db('locadora',$conexao);
 			
-		if($conexao){
-			if(isSet($_GET['cod'])){
-				$cod = $_GET['cod'];
-				$nome = $_GET['nome'];
-				
-				$resultExcluir = mysql_query("DELETE FROM categorias WHERE cod = '$cod'");
-				if($resultExcluir){
-					echo "<font color='lime'>Categoria $nome deletada com sucesso!</font> <br/><br/>";
-				} else {
-					$erro = mysql_error();
-					$errofk_categoria_esta_sendo_usada = "Cannot delete or update a parent row: a foreign key constraint fails (`locadora`.`filmes`, CONSTRAINT `fk_filmes_categoria1_categorias_cod` FOREIGN KEY (`categoria1`) REFERENCES `categorias` (`cod`))";
-					if($erro == $errofk_categoria_esta_sendo_usada){
-						echo "<font color='red'>Categoria $nome não pode ser deletada existe um ou mais filmes utilizando esta categoria</font> <br/><br/>";
-					} else {
-						echo "FALHA NA EXCLUSÃO! " . mysql_error();
-					}
-				}
+		$pesq = '';
+		
+		if(isSet($_GET['pesq'])){
+			$pesq = $_GET['pesq'];
+		}
+		if($pesq == ''){
+			$sql = "SELECT cod,cpf_cliente,data_locacao,data_entrega_prevista,data_entrega,qtd_filmes,valor FROM locacoes WHERE data_entrega is null ORDER BY data_entrega_prevista, data_locacao LIMIT 20";
+		} else {
+			if(isset($_GET['fechados']) && $_GET['fechados'] == true){
+				$sql = "SELECT cod,cpf_cliente,data_locacao,data_entrega_prevista,data_entrega,qtd_filmes,valor FROM locacoes WHERE cpf_cliente = '$pesq' ORDER BY data_entrega_prevista, data_locacao";
+			} else {
+				$sql = "SELECT cod,cpf_cliente,data_locacao,data_entrega_prevista,data_entrega,qtd_filmes,valor FROM locacoes WHERE cpf_cliente = '$pesq' AND data_entrega is null ORDER BY data_entrega_prevista, data_locacao";
 			}
-			$pesq = '';
-			if(isSet($_GET['pesq'])){
-					$pesq = $_GET['pesq'];
-			}
-				$result = mysql_query("SELECT cod,nome FROM categorias WHERE nome like '$pesq%' ORDER BY nome");
+			
+		}
+		$result = mysql_query($sql);
 				
 				if($result){
-					echo "<table border=1>
+					$hoje = date('Y-m-d');
+					
+					$hoje = strtotime($hoje);
+					
+					$amanha = $hoje + 86400;
+						echo "<table border=1>
 					<tr>
 						<td>
 							<b>Código</b>
 						</td>
 						<td>
-							<b>Nome</b>
+							<b>Cpf do Cliente</b>
 						</td>
 						<td>
-							<b>Delete</b>
+							<b>Data Locação</b>
 						</td>
 						<td>
-							<b>Editar</b>
+							<b>Data Prevista de Entrega</b>
+						</td>
+						<td>
+							<b>Data Entrega</b>
+						</td>
+						<td>
+							<b>Quantidade</b>
+						</td>
+						<td>
+							<b>Valor</b>
+						</td>
+						<td>
+							<b>Filmes</b>
+						</td>
+						<td>
+							<b>Finalizar</b>
 						</td>
 					</tr>";
 					while($row = mysql_fetch_array($result)){
@@ -95,33 +114,67 @@
 								".$row['cod']."
 							</td>
 							<td>
-								".$row['nome']."
+								".$row['cpf_cliente']."
 							</td>
 							<td>
-								<form action='".$_SERVER['PHP_SELF']."'>
+								".$row['data_locacao']."
+							</td>
+							<td>";
+								$prevista = strtotime($row['data_entrega_prevista']);
+								$dataPrevista = $row['data_entrega_prevista'];
+								
+								if($prevista < $hoje){
+									echo "<font color='red'>$dataPrevista</font>";
+								} elseif($prevista == $hoje) {
+									echo "<font color='orange'>$dataPrevista</font>";
+								} else {
+									echo "<font color='lime'>$dataPrevista</font>";
+								}
+						echo "
+							</td>
+							<td>
+								";
+								$entrega = strtotime($row['data_entrega']);
+								
+								$dataEntrega = $row['data_entrega'];
+								
+								if($entrega > ($prevista + 86399)){
+									echo "<font color='red'>$dataEntrega</font>";
+								} else {
+									echo "<font color='lime'>$dataEntrega</font>";
+								}
+						echo "
+							</td>
+							<td>
+								".$row['qtd_filmes']."
+							</td>
+							<td>
+								".$row['valor']."
+							</td>
+							<td>
+								<form action='filmesLocados.php'>
 									<input type='hidden' name='cod' value = '".$row['cod']."'/>
-									<input type='hidden' name='nome' value = '".$row['nome']."'/>
-									<input type='hidden' name='pesq' value = '".$pesq."'/>
-									<button>Delete</button>
+									<button>Filmes</button>
 								</form>
 							</td>
 							<td>
-								<form action='/aksjdji/control/editarCategoria.php'>
-									<input type='hidden' name='cod' value = '".$row['cod']."'/>
-									<input type='hidden' name='nome' value = '".$row['nome']."'/>
-									<button>Editar</button>
-								</form>
+								<form action='/aksjdji/model/finalizarLocacao.php'>
+									<input type='hidden' name='cod' value = '".$row['cod']."'/>";
+									if($row['data_entrega'] == ''){
+										echo "<button onclick=\"return confirm('Tem certeza que deseja finalizar esta locação?')\">Finalizar</button>";
+									} else {
+										echo 'Finalizada!';
+									}
+								echo "</form>
 							</td>
 						</tr>";
 					}
 					echo '</table>';
 				} else {
-					echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
+					$_SESSION['resposta'] = "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
+					header('Location:locacoes.php');
 				}
-				
-		}else {
-			echo "<font color='red'>SQL ERRO = ".mysql_error()."</font>";
-		}
+		
 		mysql_close();
 	?>
 </body>
