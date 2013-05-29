@@ -25,7 +25,7 @@ if(!$conexao){
 						INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 						LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
 						LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
-						WHERE f.nome like '$pesqFilme%' ORDER BY f.nome LIMIT 15";
+						WHERE f.nome like '$pesqFilme%' AND f.status = 'A' ORDER BY f.nome LIMIT 4";
 						break;
 				}
 				case 'cod':{
@@ -36,7 +36,7 @@ if(!$conexao){
 						INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 						LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
 						LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
-						WHERE f.cod = '$pesqFilme'";
+						WHERE f.cod = '$pesqFilme' AND f.status = 'A'";
 						break;
 				}
 				case 'categoria':{
@@ -47,7 +47,7 @@ if(!$conexao){
 						INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 						LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
 						LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
-						WHERE c1.nome like '$pesqFilme%' or c2.nome like '$pesqFilme%' or c3.nome like '$pesqFilme%' ORDER BY f.nome LIMIT 10";
+						WHERE (c1.nome like '$pesqFilme%' or c2.nome like '$pesqFilme%' or c3.nome like '$pesqFilme%') AND f.status = 'A' ORDER BY f.nome LIMIT 4";
 						break;
 				}
 					
@@ -57,7 +57,6 @@ if(!$conexao){
 			
 			while($_SESSION['pesqFilme']['result'][$i] = mysql_fetch_array($result)) //guarda todos os filmes no vetor cada posição um campo tem 9 campos entao do 0 ate 8
 			{
-				echo '<br/>';
 				$_SESSION['pesqFilme']['size'] = ($i + 1);	//guarda a quantidade de filmes adicionados
 				$i++;					
 				

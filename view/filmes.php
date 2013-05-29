@@ -68,7 +68,7 @@ include '../style.php';
 			$cod = $_GET['cod'];
 			$nome = $_GET['nome'];
 			
-			$resultExcluir = mysql_query("DELETE FROM filmes WHERE cod = '$cod'");
+			$resultExcluir = mysql_query("UPDATE filmes SET status = 'I' WHERE cod = '$cod'");
 			if($resultExcluir){
 				echo "<font color='lime'>Filme $nome deletado com sucesso!</font> <br/><br/>";
 			} else {
@@ -84,6 +84,7 @@ include '../style.php';
 				INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 				LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
 				LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
+				WHERE f.status = 'A'
 				ORDER BY nome LIMIT 15";
 		
 		if($conexao){
@@ -99,7 +100,7 @@ include '../style.php';
 							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
 							LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
-							WHERE f.nome like '$pesq%' ORDER BY f.nome LIMIT 15";
+							WHERE f.nome like '$pesq%' AND f.status = 'A' ORDER BY f.nome LIMIT 15";
 					} elseif ($tipoPesq == 'cod') {
 						$sql = "
 							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3, f.categoria1 as cod_categoria1,
@@ -108,7 +109,7 @@ include '../style.php';
 							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
 							LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
-							WHERE f.cod = '$pesq' ORDER BY f.cod LIMIT 10";
+							WHERE f.cod = '$pesq' AND f.status = 'A' ORDER BY f.cod LIMIT 10";
 					} elseif($tipoPesq == 'categoria') {
 						$sql = "
 							SELECT f.cod,f.nome,f.qtd,c1.nome as categoria1,c2.nome as categoria2,c3.nome as categoria3 , f.categoria1 as cod_categoria1,
@@ -117,7 +118,7 @@ include '../style.php';
 							INNER JOIN categorias as c1 ON f.categoria1 = c1.cod
 							LEFT OUTER JOIN categorias as c2 ON f.categoria2 = c2.cod
 							LEFT OUTER JOIN categorias as c3 ON f.categoria3 = c3.cod
-							WHERE c1.nome like '$pesq%' or c2.nome like '$pesq%' or c3.nome like '$pesq%' ORDER BY f.nome LIMIT 10";
+							WHERE (c1.nome like '$pesq%' or c2.nome like '$pesq%' or c3.nome like '$pesq%') AND f.status = 'A' ORDER BY f.nome LIMIT 10";
 					}
 				}
 				$result = mysql_query($sql);

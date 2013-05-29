@@ -18,6 +18,11 @@ div#geral {
 	
 }
 
+div#user {
+	background-color: null;
+}
+
+
 div#pesq_geral {
 	margin: 0 auto;
 	

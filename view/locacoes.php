@@ -13,7 +13,6 @@ include '../js.php'; ?>
 	<?php 
 		include '../menu.php';
 
-		session_start();
 		if(isset($_SESSION['resposta'])){
 			echo $_SESSION['resposta'].'<br/>';
 			unset($_SESSION['resposta']);

@@ -1,4 +1,4 @@
-CREATE TABLE categorias2 (
+CREATE TABLE categorias (
 	cod INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	nome VARCHAR(30) NOT NULL,
 	UNIQUE (nome)
@@ -11,6 +11,7 @@ CREATE TABLE filmes (
 	categoria1 INT,
 	categoria2 INT,
 	categoria3 INT,
+	status CHAR(1) NOT NULL DEFAULT 'A',
 	CONSTRAINT fk_filmes_categoria1_categorias_cod
 	FOREIGN KEY(categoria1) REFERENCES categorias(cod),
 	CONSTRAINT fk_filmes_categoria2_categorias_cod
@@ -47,3 +48,12 @@ CREATE TABLE filme_locado (
 	CONSTRAINT fk_filme_locado_cod_locacao_filmes_cod
 	FOREIGN KEY(cod_filme) REFERENCES filmes(cod)
 );
+
+CREATE TABLE funcionario (
+	cod_func INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	login VARCHAR(16) NOT NULL UNIQUE KEY,
+	pass VARCHAR(16) NOT NULL,
+	nome VARCHAR(45) NOT NULL
+);
+
+INSERT INTO funcionario(login, pass, nome) VALUES ('admin','admin','Administrador');
