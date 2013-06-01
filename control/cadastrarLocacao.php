@@ -10,7 +10,6 @@ include '../js.php';
 	
 	<?php include '../menu.php';
 
-		session_start();
 		
 		// exibe qualquer erro gerado durante qualquer evento
 		if(isset($_SESSION['resposta'])){
